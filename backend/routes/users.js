@@ -3,6 +3,7 @@ const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const auth = require('../middleware/auth');
 const dotenv = require('dotenv');
+const WebSocket = require('ws');
 
 //Model imports
 const Challenge = require('../models/Challenge');
