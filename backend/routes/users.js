@@ -67,8 +67,6 @@ router.post('/complete-challenge/:challengeId', auth, async (req, res) => {
   try {
     const user = await User.findById(req.user);
     const challenge = await Challenge.findById(req.params.challengeId);
-    console.log(challenge)
-    console.log(user)
 
     if (!user || !challenge) {
       return res.status(404).json('User or challenge not found');
@@ -87,11 +85,27 @@ router.post('/complete-challenge/:challengeId', auth, async (req, res) => {
     await user.save();
     await challenge.save();
 
+    // Send WebSocket event after saving user and challenge
+    wss.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify({
+          type: 'challengeCompleted',
+          payload: {
+            userId: user._id,
+            challengeId: req.params.challengeId,
+            username: user.username, // Assumes the user has a 'username' field
+            challengeTitle: challenge.title, // Assumes the challenge has a 'title' field
+          },
+        }));
+      }
+    });
+
     res.status(200).json('Challenge completed successfully');
   } catch (error) {
     res.status(500).json('Error: ' + error);
   }
 });
+
 
 // Get user streak
 router.get('/streak',auth, async (req, res) => {
