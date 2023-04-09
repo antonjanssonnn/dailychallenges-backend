@@ -90,6 +90,7 @@ const usersRouter = (wss) => {
       // Send WebSocket event after saving user and challenge
       wss.clients.forEach((client) => {
         if (client.readyState === WebSocket.OPEN) {
+          console.log("client in ready state and websocket is open")
           client.send(JSON.stringify({
             type: 'challengeCompleted',
             payload: {
@@ -101,6 +102,7 @@ const usersRouter = (wss) => {
           }));
         }
       });
+      console.log("Challenge completed successfully!")
 
       res.status(200).json('Challenge completed successfully');
     } catch (error) {
