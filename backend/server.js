@@ -27,7 +27,7 @@ connection.once('open', () => {
 });
 
 // Define your routes and models here
-app.use('/users', usersRouter);
+app.use('/users', usersRouter(wss));
 app.use('/challenges', challengesRouter);
 app.use('/friends', friendsRouter);
 
