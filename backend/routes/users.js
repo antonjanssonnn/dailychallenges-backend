@@ -4,6 +4,8 @@ const jwt = require('jsonwebtoken');
 const auth = require('../middleware/auth');
 const dotenv = require('dotenv');
 const WebSocket = require('ws');
+const FeedEvent = require('../models/FeedEvent');
+
 
 //Model imports
 const Challenge = require('../models/Challenge');
@@ -103,6 +105,15 @@ const usersRouter = (wss) => {
           }));
         }
       });
+      // Store the feed event in the database
+      const feedEvent = new FeedEvent({
+        userId: user._id,
+        challengeId: req.params.challengeId,
+        username: user.username,
+        challengeTitle: challenge.title,
+      });
+
+      await feedEvent.save();
       console.log("Challenge completed successfully!")
 
       res.status(200).json('Challenge completed successfully');

@@ -9,6 +9,7 @@ const http = require('http');
 const usersRouter = require('./routes/users');
 const challengesRouter = require('./routes/challenges');
 const friendsRouter = require('./routes/friends');
+const liveFeedRouter = require('./routes/livefeed');
 
 dotenv.config();
 const app = express();
@@ -30,6 +31,7 @@ connection.once('open', () => {
 app.use('/users', usersRouter(wss));
 app.use('/challenges', challengesRouter);
 app.use('/friends', friendsRouter);
+app.use('/live-feed', liveFeedRouter);
 
 const PORT = process.env.PORT || 5000;
 
