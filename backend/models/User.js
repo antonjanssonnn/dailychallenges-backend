@@ -11,6 +11,12 @@ const userSchema = new Schema(
       trim: true,
       minlength: 3,
     },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+    },
     password: {
       type: String,
       required: true,
@@ -45,6 +51,8 @@ userSchema.pre('save', async function (next) {
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(this.password, salt);
     this.password = hash;
+    this.username = this.username.toLowerCase();
+    this.email = this.email.toLowerCase();
   }
   next();
 });

@@ -18,16 +18,22 @@ const usersRouter = (wss) => {
 // Register a new user
   router.post('/register', async (req, res) => {
     try {
-      const { username, password } = req.body;
+      const { username, password, email } = req.body; // Add email to the destructuring assignment
 
-      // Check if the user already exists
-      const existingUser = await User.findOne({ username });
-      if (existingUser) {
+      // Check if the user already exists by username
+      const existingUserByUsername = await User.findOne({ username });
+      if (existingUserByUsername) {
         return res.status(400).json('Username already exists');
       }
 
+      // Check if the user already exists by email
+      const existingUserByEmail = await User.findOne({ email });
+      if (existingUserByEmail) {
+        return res.status(400).json('Email already exists');
+      }
+
       // Create a new user
-      const newUser = new User({ username, password });
+      const newUser = new User({ username, password, email }); // Add email to the new user object
       await newUser.save();
 
       res.status(201).json('User registered successfully');
@@ -167,13 +173,27 @@ const usersRouter = (wss) => {
 
   router.get('/leaderboard', async (req, res) => {
     try {
-      const users = await User.find().sort({ streak: -1 });
-      res.json(users);
+      const page = parseInt(req.query.page) || 1;
+      const itemsPerPage = parseInt(req.query.itemsPerPage) || 10;
+  
+      const totalUsers = await User.countDocuments();
+      const totalPages = Math.ceil(totalUsers / itemsPerPage);
+  
+      const users = await User.find()
+        .sort({ streak: -1 })
+        .skip((page - 1) * itemsPerPage)
+        .limit(itemsPerPage);
+  
+      res.json({
+        users,
+        totalPages,
+      });
     } catch (error) {
       res.status(500).json('Error: ' + error);
     }
   });
   return router;
+
 };
 
 module.exports = usersRouter;
