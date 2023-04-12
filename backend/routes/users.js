@@ -42,36 +42,38 @@ const usersRouter = (wss) => {
     }
   });
 
-  // Authenticate and log in a user
-  router.post('/login', async (req, res) => {
-    try {
-      const { username, password } = req.body;
+// Authenticate and log in a user
+router.post('/login', async (req, res) => {
+  try {
+    const { emailOrUsername, password } = req.body;
 
-      // Check if the user exists
-      const user = await User.findOne({ username });
-      if (!user) {
-        return res.status(400).json('Invalid username or password');
-      }
+    // Check if the user exists using either email or username
+    const user = await User.findOne({
+      $or: [{ email: emailOrUsername }, { username: emailOrUsername }],
+    });
 
-      // Check if the password is correct
-      const isMatch = await user.comparePassword(password);
-      if (!isMatch) {
-        return res.status(400).json('Invalid username or password');
-      }
-
-      // Generate JWT
-      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-        expiresIn: '12h',
-      });
-      console.log(`this is the secret ${process.env.JWT_SECRET}`)
-      console.log(`This is the token that the client creates: ${token}`)
-
-      res.status(200).json({ token, user: { id: user._id, username: user.username } });
-    } catch (error) {
-      res.status(500).json('Error: ' + error);
+    if (!user) {
+      return res.status(400).json('Invalid email, username or password');
     }
-  });
 
+    // Check if the password is correct
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+      return res.status(400).json('Invalid email, username or password');
+    }
+
+    // Generate JWT
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: '12h',
+    });
+    console.log(`this is the secret ${process.env.JWT_SECRET}`)
+    console.log(`This is the token that the client creates: ${token}`)
+
+    res.status(200).json({ token, user: { id: user._id, username: user.username } });
+  } catch (error) {
+    res.status(500).json('Error: ' + error);
+  }
+});
 
   // Complete a daily challenge
   router.post('/complete-challenge/:challengeId', auth, async (req, res) => {
