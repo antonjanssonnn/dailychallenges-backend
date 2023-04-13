@@ -200,8 +200,8 @@ router.post('/login', async (req, res) => {
   // Upload profile picture
   router.post('/upload-profile-picture', auth, async (req, res) => {
     try {
-
-      const user = await User.findById(req.user);
+      console.log('REQUEST', req);
+      const user = await User.findById(req.user.id);
 
       if (!user) {
         console.log('User not found:', req.user.id);
