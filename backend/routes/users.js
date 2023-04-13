@@ -111,6 +111,7 @@ router.post('/login', async (req, res) => {
               challengeId: req.params.challengeId,
               username: user.username, // Assumes the user has a 'username' field
               challengeTitle: challenge.title, // Assumes the challenge has a 'title' field
+              profilePicture: user.profilePicture
             },
           }));
         }
@@ -121,6 +122,7 @@ router.post('/login', async (req, res) => {
         challengeId: req.params.challengeId,
         username: user.username,
         challengeTitle: challenge.title,
+        profilePicture: user.profilePicture
       });
 
       await feedEvent.save();
