@@ -212,6 +212,8 @@ router.post('/login', async (req, res) => {
         { new: true }
       );
 
+      console.log('Updated user:', user); 
+
       res.json(user);
     } catch (error) {
       console.error(error);
