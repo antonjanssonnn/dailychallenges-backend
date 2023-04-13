@@ -41,7 +41,7 @@ const usersRouter = (wss) => {
         return res.status(400).json('Email already exists');
       }
 
-      const defaultProfilePicture = 'https://icons8.com/icon/tZuAOUGm9AuS/user-default'
+      const defaultProfilePicture = 'https://res.cloudinary.com/dwouoqad5/image/upload/v1681378912/profile_pictures/zyl8g1i6tlync4gdsqwj.jpg'
       // Create a new user
       const newUser = new User({ username, password, email, profilePicture: defaultProfilePicture }); // Add email to the new user object
       await newUser.save();
