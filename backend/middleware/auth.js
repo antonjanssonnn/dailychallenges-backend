@@ -13,7 +13,7 @@ const auth = (req, res, next) => {
   try {
     const decoded = jwt.verify(updatedToken, process.env.JWT_SECRET);
     console.log("Decoded token:", decoded);
-    req.user = decoded;
+    req.user = { _id: decoded._id };
     next();
   } catch (error) {
     console.error("Error while decoding token:", error);
