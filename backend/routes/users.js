@@ -170,6 +170,24 @@ router.post('/complete-challenge/:challengeId', auth, async (req, res) => {
     }
   });
 
+  router.get('/user/:userId', async (req, res) => {
+    try {
+      const user = await User.findById(req.params.userId);
+      if (!user) {
+        return res.status(404).json('User not found');
+      }
+
+      // Return only necessary fields
+      res.status(200).json({
+        _id: user._id,
+        username: user.username,
+        profilePicture: user.profilePicture,
+      });
+    } catch (error) {
+      res.status(500).json('Error: ' + error);
+    }
+  });
+
   router.get('/completed', auth, async (req, res) => {
     try {
       const user = await User.findById(req.user).populate('challengesCompleted');
