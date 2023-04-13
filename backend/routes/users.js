@@ -198,7 +198,7 @@ router.post('/login', async (req, res) => {
   });
 
   // Upload profile picture
-  router.post('/upload-profile-picture', async (req, res) => {
+  router.post('/upload-profile-picture', auth, async (req, res) => {
     try {
       const { imageBase64 } = req.body;
       const result = await cloudinary.uploader.upload(imageBase64, {
