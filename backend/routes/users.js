@@ -41,8 +41,9 @@ const usersRouter = (wss) => {
         return res.status(400).json('Email already exists');
       }
 
+      const defaultProfilePicture = 'https://icons8.com/icon/tZuAOUGm9AuS/user-default'
       // Create a new user
-      const newUser = new User({ username, password, email }); // Add email to the new user object
+      const newUser = new User({ username, password, email, profilePicture: defaultProfilePicture }); // Add email to the new user object
       await newUser.save();
 
       res.status(201).json('User registered successfully');
