@@ -84,62 +84,62 @@ router.post('/login', async (req, res) => {
   }
 });
 
-  // Complete a daily challenge
-  router.post('/complete-challenge/:challengeId', auth, async (req, res) => {
-    try {
-      const user = await User.findById(req.user);
-      const challenge = await Challenge.findById(req.params.challengeId);
+// Complete a daily challenge
+router.post('/complete-challenge/:challengeId', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user);
+    const challenge = await Challenge.findById(req.params.challengeId);
 
-      if (!user || !challenge) {
-        return res.status(404).json('User or challenge not found');
-      }
-
-      // Check if the user has already completed the challenge
-      if (user.challengesCompleted.includes(challenge._id)) {
-        return res.status(400).json('Challenge already completed');
-      }
-
-      user.challengesCompleted.push(challenge._id);
-      user.streak += 1;
-
-      challenge.completedBy.push(user._id);
-
-      await user.save();
-      await challenge.save();
-
-      // Send WebSocket event after saving user and challenge
-      wss.clients.forEach((client) => {
-        if (client.readyState === WebSocket.OPEN) {
-          console.log("client in ready state and websocket is open")
-          client.send(JSON.stringify({
-            type: 'challengeCompleted',
-            payload: {
-              userId: user._id,
-              challengeId: req.params.challengeId,
-              username: user.username, // Assumes the user has a 'username' field
-              challengeTitle: challenge.title, // Assumes the challenge has a 'title' field
-              profilePicture: user.profilePicture
-            },
-          }));
-        }
-      });
-      // Store the feed event in the database
-      const feedEvent = new FeedEvent({
-        userId: user._id,
-        challengeId: req.params.challengeId,
-        username: user.username,
-        challengeTitle: challenge.title,
-        profilePicture: user.profilePicture
-      });
-
-      await feedEvent.save();
-      console.log("Challenge completed successfully!")
-
-      res.status(200).json('Challenge completed successfully');
-    } catch (error) {
-      res.status(500).json('Error: ' + error);
+    if (!user || !challenge) {
+      return res.status(404).json('User or challenge not found');
     }
-  });
+
+    // Check if the user has already completed the challenge
+    if (user.challengesCompleted.includes(challenge._id)) {
+      return res.status(400).json('Challenge already completed');
+    }
+
+    user.challengesCompleted.push(challenge._id);
+    user.streak += 1;
+
+    challenge.completedBy.push(user._id);
+
+    await user.save();
+    await challenge.save();
+
+    // Send WebSocket event after saving user and challenge
+    wss.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        console.log("client in ready state and websocket is open")
+        client.send(JSON.stringify({
+          type: 'challengeCompleted',
+          payload: {
+            userId: user._id,
+            challengeId: req.params.challengeId,
+            username: user.username, // Assumes the user has a 'username' field
+            challengeTitle: challenge.title, // Assumes the challenge has a 'title' field
+            profilePicture: user.profilePicture
+          },
+        }));
+      }
+    });
+
+    // Store the feed event in the database without the profile picture
+    const feedEvent = new FeedEvent({
+      userId: user._id,
+      challengeId: req.params.challengeId,
+      username: user.username,
+      challengeTitle: challenge.title,
+    });
+
+    await feedEvent.save();
+    console.log("Challenge completed successfully!")
+
+    res.status(200).json('Challenge completed successfully');
+  } catch (error) {
+    res.status(500).json('Error: ' + error);
+  }
+});
 
 
   // Get user streak
