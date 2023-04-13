@@ -1,4 +1,3 @@
-const router = require('express').Router();
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const auth = require('../middleware/auth');
@@ -6,7 +5,11 @@ const dotenv = require('dotenv');
 const WebSocket = require('ws');
 const FeedEvent = require('../models/FeedEvent');
 const cloudinary = require('../config/cloudinary');
+const multer = require('multer');
 
+// Multer consts.
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage, limits: { fileSize: 100 * 1024 * 1024 } }); // 100 MB limit
 
 
 //Model imports
@@ -25,7 +28,7 @@ const usersRouter = (wss) => {
       if (!email || !password) {
         return res.status(400).json({ message: 'Email and password are required' });
       }
-      
+
       // Check if the user already exists by username
       const existingUserByUsername = await User.findOne({ username });
       if (existingUserByUsername) {
@@ -204,37 +207,41 @@ router.post('/login', async (req, res) => {
   });
 
   // Upload profile picture
-  router.post('/upload-profile-picture', auth, async (req, res) => {
-    try {
-      const user = await User.findById(req.user);
-      console.log("This is the user", user)
-      if (!user) {
-        console.log('User not found:', req.user.id);
-        res.status(404).json('User not found');
-        return;
-      }
-
-      const { imageBase64 } = req.body;
-      const result = await cloudinary.uploader.upload(imageBase64, {
-        folder: 'profile_pictures',
-      });
-
-      // Save the image URL to the user's profile
-      const updatedUser = await User.findByIdAndUpdate(
-        user.id,
-        { profilePicture: result.secure_url },
-        { new: true }
-      );
-
-      console.log('Updated user:', updatedUser); 
-
-      res.json(updatedUser);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json('Error uploading profile picture');
+ // Upload profile picture
+router.post('/upload-profile-picture', auth, upload.single('profilePicture'), async (req, res) => {
+  try {
+    const user = await User.findById(req.user);
+    console.log("This is the user", user)
+    if (!user) {
+      console.log('User not found:', req.user.id);
+      res.status(404).json('User not found');
+      return;
     }
-  });
-  
+
+    // Access the uploaded file using req.file
+    const imageBuffer = req.file.buffer;
+    const imageBase64 = `data:${req.file.mimetype};base64,${imageBuffer.toString('base64')}`;
+
+    const result = await cloudinary.uploader.upload(imageBase64, {
+      folder: 'profile_pictures',
+    });
+
+    // Save the image URL to the user's profile
+    const updatedUser = await User.findByIdAndUpdate(
+      user.id,
+      { profilePicture: result.secure_url },
+      { new: true }
+    );
+
+    console.log('Updated user:', updatedUser);
+
+    res.json(updatedUser);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json('Error uploading profile picture');
+  }
+});
+ 
   return router;
 };
 
