@@ -206,9 +206,8 @@ router.post('/login', async (req, res) => {
     }
   });
 
-  // Upload profile picture
- // Upload profile picture
-router.post('/upload-profile-picture', auth, upload.single('profilePicture'), async (req, res) => {
+// Upload profile picture
+router.post('/upload-profile-picture', auth, async (req, res) => {
   try {
     const user = await User.findById(req.user);
     console.log("This is the user", user)
@@ -218,10 +217,7 @@ router.post('/upload-profile-picture', auth, upload.single('profilePicture'), as
       return;
     }
 
-    // Access the uploaded file using req.file
-    const imageBuffer = req.file.buffer;
-    const imageBase64 = `data:${req.file.mimetype};base64,${imageBuffer.toString('base64')}`;
-
+    const { imageBase64 } = req.body;
     const result = await cloudinary.uploader.upload(imageBase64, {
       folder: 'profile_pictures',
     });
@@ -241,6 +237,7 @@ router.post('/upload-profile-picture', auth, upload.single('profilePicture'), as
     res.status(500).json('Error uploading profile picture');
   }
 });
+
  
   return router;
 };
