@@ -200,21 +200,24 @@ router.post('/login', async (req, res) => {
   // Upload profile picture
   router.post('/upload-profile-picture', auth, async (req, res) => {
     try {
+
+      const user = await User.findById(req.user);
+
       const { imageBase64 } = req.body;
       const result = await cloudinary.uploader.upload(imageBase64, {
         folder: 'profile_pictures',
       });
 
       // Save the image URL to the user's profile
-      const user = await User.findByIdAndUpdate(
+      const updatedUser = await User.findByIdAndUpdate(
         req.user.id,
         { profilePicture: result.secure_url },
         { new: true }
       );
 
-      console.log('Updated user:', user); 
+      console.log('Updated user:', updatedUser); 
 
-      res.json(user);
+      res.json(updatedUser);
     } catch (error) {
       console.error(error);
       res.status(500).json('Error uploading profile picture');
