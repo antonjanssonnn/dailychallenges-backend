@@ -22,6 +22,10 @@ const userSchema = new Schema(
       required: true,
       minlength: 6,
     },
+    profilePicture: {
+      type: String,
+      default: '',
+    },
     friends: [
       {
         type: mongoose.Schema.Types.ObjectId,

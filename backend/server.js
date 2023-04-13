@@ -4,6 +4,8 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const WebSocket = require('ws');
 const http = require('http');
+require('dotenv').config();
+
 
 // Routes
 const usersRouter = require('./routes/users');

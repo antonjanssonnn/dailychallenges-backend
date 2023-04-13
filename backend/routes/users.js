@@ -5,6 +5,8 @@ const auth = require('../middleware/auth');
 const dotenv = require('dotenv');
 const WebSocket = require('ws');
 const FeedEvent = require('../models/FeedEvent');
+const cloudinary = require('../config/cloudinary');
+
 
 
 //Model imports
@@ -194,8 +196,30 @@ router.post('/login', async (req, res) => {
       res.status(500).json('Error: ' + error);
     }
   });
-  return router;
 
+  // Upload profile picture
+  router.post('/upload-profile-picture', async (req, res) => {
+    try {
+      const { imageBase64 } = req.body;
+      const result = await cloudinary.uploader.upload(imageBase64, {
+        folder: 'profile_pictures',
+      });
+
+      // Save the image URL to the user's profile
+      const user = await User.findByIdAndUpdate(
+        req.user.id,
+        { profilePicture: result.secure_url },
+        { new: true }
+      );
+
+      res.json(user);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json('Error uploading profile picture');
+    }
+  });
+  
+  return router;
 };
 
 module.exports = usersRouter;
