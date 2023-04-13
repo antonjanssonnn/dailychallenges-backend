@@ -208,7 +208,7 @@ router.post('/login', async (req, res) => {
         res.status(404).json('User not found');
         return;
       }
-      
+
       const { imageBase64 } = req.body;
       const result = await cloudinary.uploader.upload(imageBase64, {
         folder: 'profile_pictures',
@@ -216,7 +216,7 @@ router.post('/login', async (req, res) => {
 
       // Save the image URL to the user's profile
       const updatedUser = await User.findByIdAndUpdate(
-        req.user.id,
+        req.user._id,
         { profilePicture: result.secure_url },
         { new: true }
       );
