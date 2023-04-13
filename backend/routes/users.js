@@ -200,9 +200,8 @@ router.post('/login', async (req, res) => {
   // Upload profile picture
   router.post('/upload-profile-picture', auth, async (req, res) => {
     try {
-      console.log('REQUEST', req);
-      const user = await User.findById(req.user.id);
-
+      const user = await User.findById(req.user);
+      console.log("This is the user", user)
       if (!user) {
         console.log('User not found:', req.user.id);
         res.status(404).json('User not found');
@@ -216,7 +215,7 @@ router.post('/login', async (req, res) => {
 
       // Save the image URL to the user's profile
       const updatedUser = await User.findByIdAndUpdate(
-        req.user._id,
+        user.id,
         { profilePicture: result.secure_url },
         { new: true }
       );
