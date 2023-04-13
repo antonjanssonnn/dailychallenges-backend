@@ -4,8 +4,8 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const WebSocket = require('ws');
 const http = require('http');
+const bodyParser = require('body-parser');
 require('dotenv').config();
-
 
 // Routes
 const usersRouter = require('./routes/users');
@@ -17,6 +17,8 @@ dotenv.config();
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(bodyParser.json({ limit: '1mb' }));
+app.use(bodyParser.urlencoded({ limit: '1mb', extended: true }));
 
 const server = http.createServer(app); // Create an HTTP server
 const wss = new WebSocket.Server({ server }); // Attach WebSocket server to the HTTP server

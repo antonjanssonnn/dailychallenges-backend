@@ -22,6 +22,10 @@ const usersRouter = (wss) => {
     try {
       const { username, password, email } = req.body; // Add email to the destructuring assignment
 
+      if (!email || !password) {
+        return res.status(400).json({ message: 'Email and password are required' });
+      }
+      
       // Check if the user already exists by username
       const existingUserByUsername = await User.findOne({ username });
       if (existingUserByUsername) {
