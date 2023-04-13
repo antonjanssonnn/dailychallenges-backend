@@ -203,6 +203,12 @@ router.post('/login', async (req, res) => {
 
       const user = await User.findById(req.user);
 
+      if (!user) {
+        console.log('User not found:', req.user.id);
+        res.status(404).json('User not found');
+        return;
+      }
+      
       const { imageBase64 } = req.body;
       const result = await cloudinary.uploader.upload(imageBase64, {
         folder: 'profile_pictures',
