@@ -107,6 +107,38 @@ router.delete('/:teamId', async (req, res) => {
   }
 });
 
+// Remove a member from a team
+router.put('/:teamId/remove-member', auth, async (req, res) => {
+  const { teamId } = req.params;
+  const { memberId, adminId } = req.body;
+
+  try {
+    const team = await Team.findById(teamId);
+    if (!team) {
+      return res.status(404).json('Team not found');
+    }
+
+    if (team.admin.toString() !== adminId) {
+      return res.status(403).json('Only the admin can remove members');
+    }
+
+    const user = await User.findById(memberId);
+    if (!user) {
+      return res.status(404).json('User not found');
+    }
+
+    team.members.pull(memberId);
+    user.teams.pull(teamId);
+    await team.save();
+    await user.save();
+
+    res.status(200).json('User removed from the team');
+  } catch (error) {
+    res.status(500).json('Error: ' + error);
+  }
+});
+
+
 router.get('/:teamId', teamController.getTeamById);
 
 module.exports = router;
