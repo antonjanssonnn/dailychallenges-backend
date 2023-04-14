@@ -18,7 +18,7 @@ router.post('/create', auth, async (req, res) => {
   
       const newTeam = new Team({
         name,
-        admin: user.username,
+        admin: user,
         members: [user],
       });
   
@@ -44,7 +44,7 @@ router.put('/:teamId/add-member', auth, async (req, res) => {
       return res.status(404).json('Team not found');
     }
 
-    if (team.admin !== req.user.username) { 
+    if (team.admin.toString() !== adminId) {
       return res.status(403).json('Only the admin can add members');
     }
 
@@ -66,11 +66,11 @@ router.put('/:teamId/add-member', auth, async (req, res) => {
 
 
 // List teams for a user
-router.get('/user/:username', auth, async (req, res) => {
-  const { username } = req.params;
+router.get('/user/:userId', auth, async (req, res) => {
+  const { userId } = req.params;
 
   try {
-    const user = await User.findOne({username: username}).populate('teams');
+    const user = await User.findById(userId).populate('teams');
     if (!user) {
       return res.status(404).json('User not found');
     }
