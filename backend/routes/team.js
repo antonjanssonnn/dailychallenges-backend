@@ -67,10 +67,8 @@ router.put('/:teamId/add-member', auth, async (req, res) => {
 
 // List teams for a user
 router.get('/user/:userId', auth, async (req, res) => {
-  const { userId } = req.params;
-
   try {
-    const user = await User.findById(userId).populate('teams');
+    const user = await User.findById(req.user).populate('teams');
     if (!user) {
       return res.status(404).json('User not found');
     }
