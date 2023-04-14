@@ -5,11 +5,10 @@ const teamSchema = new mongoose.Schema({
     type: String, 
     required: true, 
     unique: true },
-    admin: {
-      type: String, 
-      required: true,
-      ref: 'User',
-    },
+  admin: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'User', required: 
+    true },
   members: [{ 
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'User' }],
