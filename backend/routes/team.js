@@ -3,6 +3,7 @@ const router = express.Router();
 const Team = require('../models/Team');
 const User = require('../models/User');
 const auth = require('../middleware/auth');
+const teamController = require('../contollers/teamContoller')
 
 
 // Create a team
@@ -106,5 +107,7 @@ router.delete('/:teamId', async (req, res) => {
     res.status(500).json('Error: ' + error);
   }
 });
+
+router.get('/:teamId', teamController.getTeamById);
 
 module.exports = router;
