@@ -18,8 +18,8 @@ router.post('/create', auth, async (req, res) => {
   
       const newTeam = new Team({
         name,
-        admin: user,
-        members: [user],
+        admin: user.username,
+        members: [user.username],
       });
   
       user.teams.push(newTeam._id);
