@@ -44,7 +44,7 @@ router.put('/:teamId/add-member', auth, async (req, res) => {
       return res.status(404).json('Team not found');
     }
 
-    if (team.admin !== adminId) {
+    if (team.admin.toString() !== adminId) {
       return res.status(403).json('Only the admin can add members');
     }
 
