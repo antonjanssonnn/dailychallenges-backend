@@ -36,16 +36,12 @@ router.post('/create', auth, async (req, res) => {
 // Add a member to a team
 router.put('/:teamId/add-member', async (req, res) => {
   const { teamId } = req.params;
-  const { userId, adminId } = req.body;
+  const { userId } = req.body;
 
   try {
     const team = await Team.findById(teamId);
     if (!team) {
       return res.status(404).json('Team not found');
-    }
-
-    if (team.admin.toString() !== adminId) {
-      return res.status(403).json('Only the admin can add members');
     }
 
     const user = await User.findById(userId);
@@ -83,16 +79,11 @@ router.get('/user/:userId', async (req, res) => {
 // Delete a team
 router.delete('/:teamId', async (req, res) => {
   const { teamId } = req.params;
-  const { adminId } = req.body;
 
   try {
     const team = await Team.findById(teamId);
     if (!team) {
       return res.status(404).json('Team not found');
-    }
-
-    if (team.admin.toString() !== adminId) {
-      return res.status(403).json('Only the admin can delete the team');
     }
 
     await Promise.all(team.members.map(async (memberId) => {
