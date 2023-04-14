@@ -42,6 +42,13 @@ const userSchema = new Schema(
       type: Number,
       default: 0,
     },
+    teams: [
+      { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'Team' 
+      }
+    ],
+
   },
   {
     timestamps: true,
